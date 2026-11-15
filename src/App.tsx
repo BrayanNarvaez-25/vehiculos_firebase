@@ -1,121 +1,95 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
+import {
+  consulta1,
+  consulta2,
+  consulta3,
+  consulta4,
+  type Vehiculo,
+} from './services/vehiculoService'
+
+const consultas = [
+  { titulo: 'Consulta 1: stock > 0, precio ASC', ejecutar: consulta1 },
+  { titulo: 'Consulta 2: SUV, stock > 0, precio ASC', ejecutar: consulta2 },
+  { titulo: 'Consulta 3: precio 20000-40000, stock > 0', ejecutar: consulta3 },
+  { titulo: 'Consulta 4: Sedan, año >= 2023, año DESC', ejecutar: consulta4 },
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [titulo, setTitulo] = useState('')
+  const [vehiculos, setVehiculos] = useState<Vehiculo[]>([])
+  const [error, setError] = useState('')
+  const [cargando, setCargando] = useState(false)
+
+  const handleConsultar = async (t: string, ejecutar: () => Promise<Vehiculo[]>) => {
+    setTitulo(t)
+    setError('')
+    setVehiculos([])
+    setCargando(true)
+    try {
+      setVehiculos(await ejecutar())
+    } catch (e) {
+      // If an index is missing, the message contains the link to create it
+      setError((e as Error).message)
+    } finally {
+      setCargando(false)
+    }
+  }
+
+  const enlace = error.match(/https?:\/\/\S+/)?.[0].replace(/[.,]$/, '')
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <h1>Consulta de vehículos</h1>
+      <div>
+        {consultas.map((c) => (
+          <button key={c.titulo} onClick={() => handleConsultar(c.titulo, c.ejecutar)}>
+            {c.titulo}
+          </button>
+        ))}
+      </div>
 
-      <div className="ticks"></div>
+      {titulo && <h2>{titulo}</h2>}
+      {cargando && <p>Consultando...</p>}
+      {error && (
+        <p className="error">
+          {error.split(/https?:\/\/\S+/)[0]}
+          {enlace && (
+            <a href={enlace} target="_blank" rel="noreferrer">
+              Crear índice en Firebase Console
+            </a>
+          )}
+        </p>
+      )}
+      {titulo && !cargando && !error && <p>Resultados: {vehiculos.length}</p>}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      {vehiculos.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Tipo</th>
+              <th>Año</th>
+              <th>Precio</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vehiculos.map((v) => (
+              <tr key={v.id}>
+                <td>{v.marca}</td>
+                <td>{v.modelo}</td>
+                <td>{v.tipo}</td>
+                <td>{v.anio}</td>
+                <td>${v.precio.toLocaleString()}</td>
+                <td>{v.stock}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   )
 }
 
