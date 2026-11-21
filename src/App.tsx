@@ -7,6 +7,7 @@ import {
   consulta4,
   type Vehiculo,
 } from './services/vehiculoService'
+import VehiculoListaPaginada from './components/VehiculoListaPaginada'
 
 const consultas = [
   { titulo: 'Consulta 1: stock > 0, precio ASC', ejecutar: consulta1 },
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <div>
+      <VehiculoListaPaginada />
       <h1>Consulta de vehículos</h1>
       <div>
         {consultas.map((c) => (
