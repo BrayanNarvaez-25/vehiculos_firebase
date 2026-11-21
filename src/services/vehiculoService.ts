@@ -1,4 +1,15 @@
-import { collection, getDocs, orderBy, query, where, type Query } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  where,
+  type DocumentData,
+  type Query,
+  type QueryDocumentSnapshot,
+} from 'firebase/firestore'
 import { db } from '../firebase'
 
 export interface Vehiculo {
@@ -57,3 +68,22 @@ export const consulta4 = () =>
       orderBy('anio', 'desc')
     )
   )
+
+export const TAMANO_PAGINA = 10
+
+// Fetches one page of vehicles (10 docs) straight from Firestore.
+// Pass the last document of the previous page as the cursor to get the next one.
+export const obtenerVehiculosPaginados = async (
+  cursor?: QueryDocumentSnapshot<DocumentData>
+) => {
+  const consulta = cursor
+    ? query(vehiculosRef, orderBy('precio', 'asc'), startAfter(cursor), limit(TAMANO_PAGINA))
+    : query(vehiculosRef, orderBy('precio', 'asc'), limit(TAMANO_PAGINA))
+
+  const snapshot = await getDocs(consulta)
+
+  return {
+    vehiculos: snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Vehiculo[],
+    ultimoDocumento: snapshot.docs[snapshot.docs.length - 1] ?? null,
+  }
+}
