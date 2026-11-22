@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "generar": "tsx scripts/generarVehiculos.ts",
     "consultas": "tsx scripts/consultasVehiculos.ts",
-    "completar": "tsx scripts/completarVehiculos.ts"
+    "completar": "tsx scripts/completarVehiculos.ts",
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "firebase": "^13.3.0",
