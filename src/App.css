@@ -1,21 +1,82 @@
+.app {
+  padding: 0 16px 32px;
+}
+
+.panel {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.controles label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.controles input,
+.controles select {
+  padding: 6px 8px;
+  min-width: 140px;
+}
+
 button {
-  margin: 0 8px 8px 0;
+  padding: 7px 16px;
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
 }
 
 table {
   margin: 16px auto;
   border-collapse: collapse;
+  min-width: 100%;
+  font-size: 14px;
 }
 
 th,
 td {
-  padding: 6px 14px;
-  border: 1px solid #888;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
 }
 
 .error {
   color: #d33;
   word-break: break-word;
 }
-span { margin: 0 12px; }
+
+@media (max-width: 600px) {
+  .controles label,
+  .controles input,
+  .controles select {
+    width: 100%;
+  }
+}
