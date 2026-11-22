@@ -1,5 +1,6 @@
 import './App.css'
 import InventarioVehiculos from './components/InventarioVehiculos'
+import ConsultasVehiculos from './components/ConsultasVehiculos'
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
         <p>Consulta el inventario por marca, tipo, combustible, precio y disponibilidad.</p>
       </header>
       <InventarioVehiculos />
+      <ConsultasVehiculos />
     </div>
   )
 }
