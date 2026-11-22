@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react'
 import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore'
 import {
   consultarPagina,
-  obtenerVideojuegoPorId,
+  obtenerVehiculoPorId,
   TAMANO_PAGINA,
   type Patron,
-  type Videojuego,
-} from '../services/videojuegoService'
+  type VehiculoInventario,
+} from '../services/inventarioService'
 import PanelFiltros from './PanelFiltros'
 
 type Cursor = QueryDocumentSnapshot<DocumentData>
 
-export const CatalogoVideojuegos = () => {
+export const InventarioVehiculos = () => {
   const [patron, setPatron] = useState<Patron>({ tipo: 'todos' })
-  const [videojuegos, setVideojuegos] = useState<Videojuego[]>([])
+  const [vehiculos, setVehiculos] = useState<VehiculoInventario[]>([])
   const [pagina, setPagina] = useState(1)
   // cursores[i] = last document of page i + 1, used as startAfter for the next page
   const [cursores, setCursores] = useState<Cursor[]>([])
@@ -34,13 +34,13 @@ export const CatalogoVideojuegos = () => {
       if (resultado.ultimoDocumento) nuevos[numero - 1] = resultado.ultimoDocumento
 
       setPatron(p)
-      setVideojuegos(resultado.videojuegos)
+      setVehiculos(resultado.vehiculos)
       setCursores(nuevos)
       setPagina(numero)
-      setHayMas(resultado.videojuegos.length === TAMANO_PAGINA)
+      setHayMas(resultado.vehiculos.length === TAMANO_PAGINA)
     } catch (e) {
       // If an index is missing, the message includes the link to create it
-      setVideojuegos([])
+      setVehiculos([])
       setHayMas(false)
       setError((e as Error).message)
     } finally {
@@ -52,8 +52,8 @@ export const CatalogoVideojuegos = () => {
     setCargando(true)
     setError('')
     try {
-      const encontrado = await obtenerVideojuegoPorId(id)
-      setVideojuegos(encontrado ? [encontrado] : [])
+      const encontrado = await obtenerVehiculoPorId(id)
+      setVehiculos(encontrado ? [encontrado] : [])
       setBusquedaId(id)
       setHayMas(false)
       setPagina(1)
@@ -68,9 +68,9 @@ export const CatalogoVideojuegos = () => {
     // Initial load: first 10 documents only
     consultarPagina({ tipo: 'todos' })
       .then((r) => {
-        setVideojuegos(r.videojuegos)
+        setVehiculos(r.vehiculos)
         setCursores(r.ultimoDocumento ? [r.ultimoDocumento] : [])
-        setHayMas(r.videojuegos.length === TAMANO_PAGINA)
+        setHayMas(r.vehiculos.length === TAMANO_PAGINA)
       })
       .catch((e) => setError((e as Error).message))
   }, [])
@@ -97,38 +97,40 @@ export const CatalogoVideojuegos = () => {
           </p>
         )}
         {cargando && <p>Consultando...</p>}
-        {busquedaId && videojuegos.length === 0 && !error && (
-          <p>No existe ningún videojuego con el ID {busquedaId}.</p>
+        {busquedaId && vehiculos.length === 0 && !error && (
+          <p>No existe ningún vehículo con el ID {busquedaId}.</p>
         )}
 
-        {videojuegos.length > 0 && (
+        {vehiculos.length > 0 && (
           <div className="tabla-scroll">
             <table>
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Título</th>
-                  <th>Plataforma</th>
-                  <th>Género</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Tipo</th>
+                  <th>Año</th>
                   <th>Precio</th>
                   <th>Disponible</th>
-                  <th>Calificación</th>
-                  <th>Desarrollador</th>
-                  <th>Multijugador</th>
+                  <th>Motor</th>
+                  <th>Combustible</th>
+                  <th>Transmisión</th>
                 </tr>
               </thead>
               <tbody>
-                {videojuegos.map((v) => (
+                {vehiculos.map((v) => (
                   <tr key={v.id}>
                     <td>{v.id}</td>
-                    <td>{v.titulo}</td>
-                    <td>{v.plataforma}</td>
-                    <td>{v.genero}</td>
-                    <td>${v.precio.toFixed(2)}</td>
+                    <td>{v.marca}</td>
+                    <td>{v.modelo}</td>
+                    <td>{v.tipo}</td>
+                    <td>{v.anio}</td>
+                    <td>${v.precio.toLocaleString()}</td>
                     <td>{v.disponible ? 'Sí' : 'No'}</td>
-                    <td>{v.calificacion}</td>
-                    <td>{v.detalles.desarrollador}</td>
-                    <td>{v.detalles.multijugador ? 'Sí' : 'No'}</td>
+                    <td>{v.especificaciones.motor}</td>
+                    <td>{v.especificaciones.combustible}</td>
+                    <td>{v.especificaciones.transmision}</td>
                   </tr>
                 ))}
               </tbody>
@@ -158,4 +160,4 @@ export const CatalogoVideojuegos = () => {
   )
 }
 
-export default CatalogoVideojuegos
+export default InventarioVehiculos

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GENEROS, PLATAFORMAS, type Patron } from '../services/videojuegoService'
+import { COMBUSTIBLES, MARCAS, TIPOS, type Patron } from '../services/inventarioService'
 
 interface Props {
   onConsultar: (patron: Patron) => void
@@ -7,33 +7,36 @@ interface Props {
   deshabilitado: boolean
 }
 
-const TIPOS: { valor: Patron['tipo']; etiqueta: string }[] = [
-  { valor: 'todos', etiqueta: 'Todos los videojuegos (A-Z)' },
-  { valor: 'plataforma', etiqueta: 'Por plataforma' },
+const PATRONES: { valor: Patron['tipo']; etiqueta: string }[] = [
+  { valor: 'todos', etiqueta: 'Todo el inventario (por marca)' },
+  { valor: 'marca', etiqueta: 'Por marca' },
   { valor: 'disponibles', etiqueta: 'Solo disponibles' },
   { valor: 'rangoPrecio', etiqueta: 'Rango de precios' },
-  { valor: 'genero', etiqueta: 'Por género (mejor calificados)' },
-  { valor: 'multijugador', etiqueta: 'Multijugador disponibles' },
+  { valor: 'carroceria', etiqueta: 'Por tipo de carrocería' },
+  { valor: 'combustible', etiqueta: 'Disponibles por combustible' },
 ]
 
 export const PanelFiltros = ({ onConsultar, onBuscarPorId, deshabilitado }: Props) => {
-  const [tipo, setTipo] = useState<Patron['tipo']>('todos')
-  const [plataforma, setPlataforma] = useState(PLATAFORMAS[0])
-  const [genero, setGenero] = useState(GENEROS[0])
-  const [min, setMin] = useState('20')
-  const [max, setMax] = useState('40')
+  const [patron, setPatron] = useState<Patron['tipo']>('todos')
+  const [marca, setMarca] = useState(MARCAS[0])
+  const [carroceria, setCarroceria] = useState(TIPOS[0])
+  const [combustible, setCombustible] = useState(COMBUSTIBLES[0])
+  const [min, setMin] = useState('20000')
+  const [max, setMax] = useState('40000')
   const [id, setId] = useState('')
 
   const handleConsultar = () => {
-    switch (tipo) {
-      case 'plataforma':
-        return onConsultar({ tipo, plataforma })
-      case 'genero':
-        return onConsultar({ tipo, genero })
+    switch (patron) {
+      case 'marca':
+        return onConsultar({ tipo: patron, marca })
+      case 'carroceria':
+        return onConsultar({ tipo: patron, carroceria })
+      case 'combustible':
+        return onConsultar({ tipo: patron, combustible })
       case 'rangoPrecio':
-        return onConsultar({ tipo, min: Number(min), max: Number(max) })
+        return onConsultar({ tipo: patron, min: Number(min), max: Number(max) })
       default:
-        return onConsultar({ tipo })
+        return onConsultar({ tipo: patron })
     }
   }
 
@@ -43,38 +46,49 @@ export const PanelFiltros = ({ onConsultar, onBuscarPorId, deshabilitado }: Prop
       <div className="controles">
         <label>
           Consulta
-          <select value={tipo} onChange={(e) => setTipo(e.target.value as Patron['tipo'])}>
-            {TIPOS.map((t) => (
-              <option key={t.valor} value={t.valor}>
-                {t.etiqueta}
+          <select value={patron} onChange={(e) => setPatron(e.target.value as Patron['tipo'])}>
+            {PATRONES.map((p) => (
+              <option key={p.valor} value={p.valor}>
+                {p.etiqueta}
               </option>
             ))}
           </select>
         </label>
 
-        {tipo === 'plataforma' && (
+        {patron === 'marca' && (
           <label>
-            Plataforma
-            <select value={plataforma} onChange={(e) => setPlataforma(e.target.value)}>
-              {PLATAFORMAS.map((p) => (
-                <option key={p}>{p}</option>
+            Marca
+            <select value={marca} onChange={(e) => setMarca(e.target.value)}>
+              {MARCAS.map((m) => (
+                <option key={m}>{m}</option>
               ))}
             </select>
           </label>
         )}
 
-        {tipo === 'genero' && (
+        {patron === 'carroceria' && (
           <label>
-            Género
-            <select value={genero} onChange={(e) => setGenero(e.target.value)}>
-              {GENEROS.map((g) => (
-                <option key={g}>{g}</option>
+            Tipo
+            <select value={carroceria} onChange={(e) => setCarroceria(e.target.value)}>
+              {TIPOS.map((t) => (
+                <option key={t}>{t}</option>
               ))}
             </select>
           </label>
         )}
 
-        {tipo === 'rangoPrecio' && (
+        {patron === 'combustible' && (
+          <label>
+            Combustible
+            <select value={combustible} onChange={(e) => setCombustible(e.target.value)}>
+              {COMBUSTIBLES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        {patron === 'rangoPrecio' && (
           <>
             <label>
               Precio mínimo
@@ -97,7 +111,7 @@ export const PanelFiltros = ({ onConsultar, onBuscarPorId, deshabilitado }: Prop
           Buscar por ID
           <input
             type="text"
-            placeholder="VJ001"
+            placeholder="VEH001"
             value={id}
             onChange={(e) => setId(e.target.value)}
           />

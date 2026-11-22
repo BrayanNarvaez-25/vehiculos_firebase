@@ -1,14 +1,14 @@
 import './App.css'
-import CatalogoVideojuegos from './components/CatalogoVideojuegos'
+import InventarioVehiculos from './components/InventarioVehiculos'
 
 function App() {
   return (
     <div className="app">
       <header>
-        <h1>Catálogo de videojuegos</h1>
-        <p>Consulta el inventario por plataforma, género, precio y disponibilidad.</p>
+        <h1>Inventario de vehículos</h1>
+        <p>Consulta el inventario por marca, tipo, combustible, precio y disponibilidad.</p>
       </header>
-      <CatalogoVideojuegos />
+      <InventarioVehiculos />
     </div>
   )
 }
